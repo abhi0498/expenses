@@ -33,9 +33,10 @@ const items: MenuItem[] = [
     link: "/profile",
   },
 ];
+const pathsToHide = ["/new", "/login", "/signup"];
 const BottomNav = () => {
   const currentPath = usePathname();
-  if (currentPath === "/new") return null;
+  if (pathsToHide.includes(currentPath)) return null;
   return (
     <div className="btm-nav">
       {items.map((item, index) => (
