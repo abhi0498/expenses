@@ -40,8 +40,15 @@ export default function AuthForm() {
         theme="dark"
         showLinks={true}
         providers={[]}
-        redirectTo={new URL("/", window.location.href).toString()}
+        redirectTo={new URL(
+          "/",
+          typeof window !== "undefined"
+            ? window.location.href
+            : "http://localhost:3000/"
+        ).toString()}
       />
     </>
   );
 }
+
+export const preRender = false;

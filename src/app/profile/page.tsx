@@ -1,5 +1,6 @@
+"use server";
 import Avatar from "@/components/Avatar";
-import { supabase } from "@/utils/supabase/server";
+import { supabase } from "@/utils/supabase/client";
 import UserForm from "./_user_form";
 
 const Profile = async () => {
