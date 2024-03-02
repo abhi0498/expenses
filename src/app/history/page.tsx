@@ -6,6 +6,7 @@ import dayjs from "dayjs";
 import { supabase } from "@/utils/supabase/client";
 import { Database } from "@/types/supabase";
 import { User } from "@supabase/supabase-js";
+import Loader from "@/components/Loader";
 
 type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
   category: {
@@ -19,13 +20,7 @@ const History = () => {
   const [month, setMonth] = useState(dayjs().month());
   const [year, setYear] = useState(dayjs().year());
   const [sort, setSort] = useState<"asc" | "desc">("desc");
-  // const { data } = await supabase.auth.getUser();
-
-  // const { data: expenses } = await supabase
-  //   .from("expenses")
-  //   .select("*, category:categories(name)")
-  //   .eq("created_by", data.user?.id!)
-  //   .order("date", { ascending: false });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,6 +32,7 @@ const History = () => {
 
   useEffect(() => {
     const fetchExpenses = async () => {
+      setLoading(true);
       const { data: expenses } = await supabase
         .from("expenses")
         .select("*, category:categories(name)")
@@ -56,6 +52,7 @@ const History = () => {
         .order("date", { ascending: sort === "asc" });
 
       setExpenses(expenses as Array<Expense>);
+      setLoading(false);
     };
     if (user?.id) fetchExpenses();
   }, [user?.id, month, year, sort]);
@@ -64,8 +61,18 @@ const History = () => {
     return expenses.reduce((acc, expense) => acc + expense.price, 0);
   }, [expenses]);
 
+  const groupedExpensesByDate = useMemo(() => {
+    return expenses.reduce((acc, expense) => {
+      const date = dayjs(expense.date).format("DD-MM-YYYY");
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(expense);
+      return acc;
+    }, {} as Record<string, Array<Expense>>);
+  }, [expenses]);
+
   return (
     <main className="p-6">
+      {loading && <Loader />}
       <h1 className="text-4xl font-bold">Monthly Expenses</h1>
 
       <div className="flex items-center gap-4 mt-6">
@@ -107,22 +114,35 @@ const History = () => {
         Total: ₹{totalMonthExpense.toFixed(2)}
       </h2>
       <div className="flex flex-col gap-2 mt-4 overflow-scroll h-[75vh] pb-24">
-        {expenses?.map((expense, index) => (
-          <div
-            key={expense.id}
-            className="flex items-center justify-between py-4 border-t first:border-0 dark:border-gray-200"
-          >
-            <div className="flex flex-col">
-              <span className="text-md font-medium">
-                {dayjs(expense.date).format("DD-MM-YYYY")}
-              </span>
-              <span className="text-md font-medium">
-                {expense.category?.name}
+        {Object.entries(groupedExpensesByDate).map(([date, expenses]) => (
+          <div key={date} className="flex flex-col gap-2">
+            <div className="flex items-center justify-between py-2 border-b  dark:border-gray-200">
+              <h3 className="text-xl font-bold text">{date}</h3>
+              <span className="text-lg font-semibold">
+                ₹
+                {expenses
+                  .reduce((acc, expense) => acc + expense.price, 0)
+                  .toFixed(2)}
               </span>
             </div>
-            <span className="text-base font-semibold">
-              ₹{expense.price.toFixed(2)}
-            </span>
+            {expenses.map((expense, index) => (
+              <div
+                key={expense.id}
+                className="flex items-center justify-between py-4"
+              >
+                <div className="flex flex-col">
+                  <span className="text-lg font-semibold">{expense.name}</span>
+                  <span className="text-md font-medium">
+                    {expense.category?.name}
+                  </span>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="text-base font-semibold">
+                    ₹{expense.price.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>

@@ -10,16 +10,20 @@
 //   );
 // }
 "use client";
+import Loader from "@/components/Loader";
 import { supabase } from "@/utils/supabase/client";
 import supabaseServerComponentClient from "@/utils/supabase/server";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import toast from "react-hot-toast";
-
+import { twJoin, twMerge } from "tailwind-merge";
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   return (
     <main className="p-6">
+      {loading && <Loader />}
       <h1 className="text-4xl font-bold">Welcome to Minnie Book</h1>
       <p className="text-sm font-normal mt-4">Manage your expenses with ease</p>
 
@@ -46,11 +50,11 @@ export default function LoginPage() {
           </label>
 
           <button
-            className="btn btn-primary w-full mx-12"
+            className={twJoin("btn btn-primary w-full mx-12")}
             type="submit"
             formAction={async (formData) => {
-              console.log("formData", formData);
-
+              alert("submit");
+              setLoading(true);
               try {
                 const { data, error } = await supabase.auth.signInWithPassword({
                   email: formData.get("email") as string,
@@ -61,7 +65,10 @@ export default function LoginPage() {
                 }
 
                 router.push("/");
-              } catch (error) {}
+              } catch (error) {
+              } finally {
+                setLoading(false);
+              }
             }}
           >
             Login
@@ -69,7 +76,7 @@ export default function LoginPage() {
         </div>
       </form>
       <button
-        className="btn btn-secondary w-full mx-auto mt-4"
+        className={twJoin(["btn btn-secondary w-full mx-auto mt-4"])}
         onClick={async () => {
           const form = document.getElementById("login") as HTMLFormElement;
           const formData = new FormData(form);
