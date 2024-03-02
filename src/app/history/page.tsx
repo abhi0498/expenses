@@ -113,9 +113,12 @@ const History = () => {
       <h2 className="text-2xl font-bold mt-4">
         Total: ₹{totalMonthExpense.toFixed(2)}
       </h2>
-      <div className="flex flex-col gap-2 mt-4 overflow-scroll h-[75vh] pb-24">
+      <div className="flex flex-col gap-5 mt-4 overflow-scroll h-[75vh] pb-24">
         {Object.entries(groupedExpensesByDate).map(([date, expenses]) => (
-          <div key={date} className="flex flex-col gap-2">
+          <div
+            key={date}
+            className="flex flex-col gap-2 card shadow-xl p-4 bg-slate-800"
+          >
             <div className="flex items-center justify-between py-2 border-b  dark:border-gray-200">
               <h3 className="text-xl font-bold text">{date}</h3>
               <span className="text-lg font-semibold">
@@ -128,7 +131,7 @@ const History = () => {
             {expenses.map((expense, index) => (
               <div
                 key={expense.id}
-                className="flex items-center justify-between py-4"
+                className="flex items-center justify-between py-2"
               >
                 <div className="flex flex-col">
                   <span className="text-lg font-semibold">{expense.name}</span>
