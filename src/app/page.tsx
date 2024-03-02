@@ -5,6 +5,7 @@ import { FiPlus } from "react-icons/fi";
 import { ResponsiveBar } from "@nivo/bar";
 import BarChart from "@/components/BarChart";
 import AddButton from "@/components/AddButton";
+import supabaseServerComponentClient from "@/utils/supabase/server";
 
 const data = [
   {
@@ -37,14 +38,24 @@ const data = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await supabaseServerComponentClient();
+  const { data: user } = await supabase.auth.getUser();
+  const { data: profile } = await supabase
+    .from("profile")
+    .select()
+    .eq("user_id", user?.user?.id!)
+    .limit(1)
+    .single();
+
   return (
     <main className="p-6">
-      <h1 className="text-4xl font-bold">Welcome back!</h1>
+      <h1 className="text-4xl font-bold">Welcome back, {profile?.name}!</h1>
 
       <AddButton />
 
-      <div className="flex w-full h-[40vh]">
+      <div className="flex flex-col w-full h-[40vh]">
+        <h1 className="text-2xl font-bold mt-4">This week</h1>
         <BarChart data={data} />
       </div>
     </main>

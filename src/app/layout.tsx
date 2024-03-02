@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import BottomNav from "@/components/BottomNav";
-
+import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
@@ -35,8 +35,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="sunset">
-      <body className={inter.className}>{children}</body>
-      <BottomNav />
+      <body suppressHydrationWarning={true} className={inter.className}>
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            className: "bg-gray-800 text-white",
+          }}
+        />
+        {children}
+        <BottomNav />
+      </body>
     </html>
   );
 }

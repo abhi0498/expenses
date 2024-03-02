@@ -3,6 +3,7 @@ import Loader from "@/components/Loader";
 import { Database } from "@/types/supabase";
 import { supabase } from "@/utils/supabase/client";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 const UserForm = ({
   profile,
@@ -15,9 +16,17 @@ const UserForm = ({
   const [loading, setLoading] = useState(false);
 
   const saveProfile = async () => {
-    setLoading(true);
-    await supabase.from("profile").update({ name: name }).eq("id", profile?.id);
-    setLoading(false);
+    toast.promise(
+      supabase
+        .from("profile")
+        .update({ name: name })
+        .eq("id", profile?.id) as any,
+      {
+        loading: "Saving profile...",
+        success: "Profile saved",
+        error: "Failed to save profile",
+      }
+    );
   };
   return (
     <div className="mt-4 flex flex-col items-center w-full px-8 gap-4">

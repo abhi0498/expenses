@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import Loader from "./Loader";
+import toast from "react-hot-toast";
 
 const Avatar = ({ url, uid }: { url: string; uid: string }) => {
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -13,48 +14,39 @@ const Avatar = ({ url, uid }: { url: string; uid: string }) => {
   const uploadAvatar: React.ChangeEventHandler<HTMLInputElement> = async (
     event
   ) => {
-    try {
-      setUploading(true);
-
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error("You must select an image to upload.");
-      }
-
-      const file = event.target.files[0];
-      const fileExt = file.name.split(".").pop();
-      const filePath = `${uid}/${Math.random()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-      const { data } = await supabase
-        .from("profile")
-        .select("id")
-        .eq("user_id", uid)
-        .limit(1)
-        .single();
-      alert(data?.id);
-      if (!data?.id) {
-        await supabase
-          .from("profile")
-          .insert({ avatar_url: filePath, user_id: uid });
-      } else {
-        await supabase
-          .from("profile")
-          .update({ avatar_url: filePath, user_id: uid })
-          .eq("id", data?.id);
-      }
-
-      downloadImage(filePath);
-      //   onUpload(filePath);
-    } catch (error) {
-      alert("Error uploading avatar!");
-    } finally {
-      setUploading(false);
+    if (!event.target.files || event.target.files.length === 0) {
+      throw new Error("You must select an image to upload.");
     }
+
+    const file = event.target.files[0];
+    const fileExt = file.name.split(".").pop();
+    const filePath = `${uid}/${Math.random()}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file);
+
+    if (uploadError) {
+      throw uploadError;
+    }
+    const { data } = await supabase
+      .from("profile")
+      .select("id")
+      .eq("user_id", uid)
+      .limit(1)
+      .single();
+    if (!data?.id) {
+      await supabase
+        .from("profile")
+        .insert({ avatar_url: filePath, user_id: uid });
+    } else {
+      await supabase
+        .from("profile")
+        .update({ avatar_url: filePath, user_id: uid })
+        .eq("id", data?.id);
+    }
+
+    downloadImage(filePath);
+    return filePath;
   };
 
   async function downloadImage(path: string) {
@@ -85,7 +77,13 @@ const Avatar = ({ url, uid }: { url: string; uid: string }) => {
       <input
         type="file"
         className="grow"
-        onChange={uploadAvatar}
+        onChange={(event) => {
+          toast.promise(uploadAvatar(event) as any, {
+            loading: "Uploading...",
+            success: "Uploaded successfully",
+            error: "Failed to upload",
+          });
+        }}
         disabled={uploading}
         style={{
           display: "none",

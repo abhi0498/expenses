@@ -9,6 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categories: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: number
+          is_global: boolean | null
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
+          is_global?: boolean | null
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: number
+          is_global?: boolean | null
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_categories_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      expenses: {
+        Row: {
+          category_id: number
+          created_at: string
+          created_by: string | null
+          date: string
+          id: number
+          name: string
+          price: number
+        }
+        Insert: {
+          category_id: number
+          created_at?: string
+          created_by?: string | null
+          date: string
+          id?: number
+          name: string
+          price: number
+        }
+        Update: {
+          category_id?: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          id?: number
+          name?: string
+          price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profile: {
         Row: {
           avatar_url: string | null
@@ -35,7 +112,7 @@ export type Database = {
           {
             foreignKeyName: "public_profile_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
