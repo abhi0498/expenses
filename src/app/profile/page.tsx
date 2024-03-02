@@ -1,9 +1,10 @@
 "use server";
 import Avatar from "@/components/Avatar";
-import { supabase } from "@/utils/supabase/client";
+import supabaseServerComponentClient from "@/utils/supabase/server";
 import UserForm from "./_user_form";
 
 const Profile = async () => {
+  const supabase = await supabaseServerComponentClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

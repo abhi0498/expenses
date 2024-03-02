@@ -1,13 +1,8 @@
-import { Database } from "@/types/supabase";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import { cache } from "react";
 
-export const createServerClient = cache(() => {
-  const cookieStore = cookies();
-  return createServerComponentClient<Database>({
-    cookies: () => cookieStore,
-  });
-});
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Database } from "@/types/supabase";
 
-export const supabase = createServerClient();
+export default async function supabaseServerComponentClient() {
+  return createServerComponentClient<Database>({ cookies });
+}
