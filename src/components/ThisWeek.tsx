@@ -196,7 +196,7 @@ const ThisWeek = () => {
             acc[index].rupees += expense.price;
             return acc;
           },
-          initialArray?.map((e) => ({ ...e }))
+          initialArray?.map((e: any) => ({ ...e }))
         ) as any
       );
 
