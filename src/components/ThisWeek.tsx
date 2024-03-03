@@ -230,7 +230,7 @@ const ThisWeek = () => {
       <div className="flex flex-col w-full h-[40vh]">
         <div className="flex gap-4 items-center">
           <h1 className="text-2xl font-bold mt-4">
-            Total spendings: ₹{totalWeekly}
+            Total spendings: ₹{totalWeekly.toFixed(2)}
           </h1>
 
           <select

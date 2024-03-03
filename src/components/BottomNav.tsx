@@ -19,17 +19,17 @@ type MenuItem = {
 const items: MenuItem[] = [
   {
     label: "Dashboard",
-    icon: <FiBarChart2 />,
+    icon: <FiBarChart2 fontSize={20} />,
     link: "/",
   },
   {
     label: "History",
-    icon: <FiClock />,
+    icon: <FiClock fontSize={20} />,
     link: "/history",
   },
   {
     label: "Profile",
-    icon: <FiUser />,
+    icon: <FiUser fontSize={20} />,
     link: "/profile",
   },
 ];
