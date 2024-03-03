@@ -7,8 +7,9 @@ import { supabase } from "@/utils/supabase/client";
 import { Database } from "@/types/supabase";
 import { User } from "@supabase/supabase-js";
 import Loader from "@/components/Loader";
-import { FiXCircle } from "react-icons/fi";
+import { FiEdit, FiXCircle } from "react-icons/fi";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
   category: {
@@ -26,6 +27,8 @@ const History = () => {
   const [year, setYear] = useState(dayjs().year());
   const [sort, setSort] = useState<"asc" | "desc">("desc");
   const [loading, setLoading] = useState(true);
+
+  const navigation = useRouter();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -272,6 +275,12 @@ const History = () => {
                   </span>
                 </div>
                 <div className="flex flex-col items-end">
+                  <FiEdit
+                    fontSize={20}
+                    onClick={() => {
+                      navigation.push(`/edit/${expense.id}`);
+                    }}
+                  />
                   <span className="text-base font-semibold">
                     ₹{expense.price.toFixed(2)}
                   </span>

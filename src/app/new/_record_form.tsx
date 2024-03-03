@@ -30,9 +30,15 @@ const TextInput = ({ label, placeholder, ...props }: TextInputProps) => {
   );
 };
 
-const RecordForm = () => {
+const RecordForm = ({
+  initialData,
+}: {
+  initialData: Database["public"]["Tables"]["expenses"]["Row"];
+}) => {
   const navigation = useRouter();
-  const formMethods = useForm();
+  const formMethods = useForm({
+    defaultValues: initialData,
+  });
   const formMethodsDialog = useForm();
 
   const [categories, setCategories] = React.useState<
@@ -53,15 +59,34 @@ const RecordForm = () => {
     fetchCategories();
   }, []);
 
+  useEffect(() => {
+    console.log({ initialData });
+
+    formMethods.reset(initialData);
+  }, [initialData]);
+
   const onSubmit = async (data: any) => {
-    toast.promise(supabase.from("expenses").insert([data]) as any, {
-      loading: "Adding expense...",
-      success: "Expense added successfully",
-      error: "Failed to add expense",
-    });
+    if (!initialData?.id) {
+      toast.promise(supabase.from("expenses").insert([data]) as any, {
+        loading: "Adding expense...",
+        success: "Expense added successfully",
+        error: "Failed to add expense",
+      });
+    } else {
+      toast.promise(
+        supabase.from("expenses").update(data).eq("id", initialData.id) as any,
+        {
+          loading: "Updating expense...",
+          success: "Expense updated successfully",
+          error: "Failed to update expense",
+        }
+      );
+    }
     navigation.prefetch("/history");
     navigation.back();
   };
+
+  const values = formMethods.watch();
 
   return (
     <>
@@ -83,9 +108,13 @@ const RecordForm = () => {
           <div className="flex gap-2 flex-col">
             <label className="text-lg font-bold">Category</label>
             <select
+              value={values.category_id}
               className="select select-bordered border border-gray-200 rounded-lg"
               onChange={(event) => {
-                formMethods.setValue("category_id", event.target.value);
+                formMethods.setValue(
+                  "category_id",
+                  Number(event?.target?.value!)
+                );
               }}
             >
               <option disabled selected>
@@ -113,12 +142,12 @@ const RecordForm = () => {
           {/* <TextInput label="Category" placeholder="Enter category" /> */}
         </div>
 
-        <div className="p-4 absolute bottom-10 left-0 px-8 w-full">
+        <div className="p-4 absolute bottom-16 left-0 px-8 w-full">
           <button
             className="text-white text-lg font-bold w-full h-12 rounded-lg bg-primary"
             onClick={formMethods.handleSubmit(onSubmit)}
           >
-            Add
+            {initialData?.id ? "Update" : "Add"}
           </button>
         </div>
       </FormProvider>
