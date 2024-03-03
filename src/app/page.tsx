@@ -34,7 +34,7 @@ export default function Home() {
     <main className="p-6">
       {loading && <Loader />}
       <AddButton />
-      <h1 className="text-4xl font-bold">Welcome back, {profile?.name}!!!</h1>
+      <h1 className="text-4xl font-bold">Welcome back, {profile?.name}!</h1>
 
       <div className="overflow-y-scroll pb-32">
         <ThisWeek />
