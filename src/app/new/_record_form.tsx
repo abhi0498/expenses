@@ -22,7 +22,7 @@ const TextInput = ({ label, placeholder, ...props }: TextInputProps) => {
         {...formMethods.register(props.name, { required: true })}
         type="text"
         placeholder={placeholder}
-        className="p-4 border border-gray-200 rounded-lg"
+        className="p-4 border border-gray-200 rounded-lg w-full"
         // {...formMethods.register(props.name)}
         {...props}
       />
