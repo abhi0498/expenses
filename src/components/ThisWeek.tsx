@@ -9,6 +9,7 @@ import {
   VictoryPie,
   VictoryTheme,
 } from "victory";
+import Loader from "./Loader";
 
 const options = {
   chart: {},
@@ -101,8 +102,10 @@ const ThisWeek = () => {
   const [expenses, setExpenses] = useState<Array<any>>([]);
   const [pieExpenses, setPieExpenses] = useState<Array<any>>([]);
   const [selected, setSelected] = useState("This week");
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
+      setLoading(true);
       let format, start, end, initialArray: any;
       switch (selected) {
         case "This week":
@@ -208,6 +211,8 @@ const ThisWeek = () => {
         return { x: category, y: rupees, label: `${category}` };
       });
       setPieExpenses(pieExpenses);
+
+      setLoading(false);
     })();
   }, [selected]);
 
@@ -222,6 +227,7 @@ const ThisWeek = () => {
 
   return (
     <>
+      {loading && <Loader />}
       <div className="flex flex-col w-full h-[40vh]">
         <div className="flex gap-4 items-center">
           <h1 className="text-2xl font-bold mt-4">
