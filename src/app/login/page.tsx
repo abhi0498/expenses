@@ -53,7 +53,6 @@ export default function LoginPage() {
             className={twJoin("btn btn-primary w-full mx-12")}
             type="submit"
             formAction={async (formData) => {
-              alert("submit");
               setLoading(true);
               try {
                 const { data, error } = await supabase.auth.signInWithPassword({
