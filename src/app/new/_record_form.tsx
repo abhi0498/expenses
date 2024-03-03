@@ -47,7 +47,6 @@ const RecordForm = () => {
       ?.select()
       .or(`is_global.eq.TRUE,created_by.eq.${userId}`);
 
-    console.log(userId, response);
     setCategories(response?.data!);
   };
   useEffect(() => {

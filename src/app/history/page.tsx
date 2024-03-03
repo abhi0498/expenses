@@ -7,6 +7,8 @@ import { supabase } from "@/utils/supabase/client";
 import { Database } from "@/types/supabase";
 import { User } from "@supabase/supabase-js";
 import Loader from "@/components/Loader";
+import { FiXCircle } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
   category: {
@@ -17,6 +19,9 @@ type Expense = Database["public"]["Tables"]["expenses"]["Row"] & {
 const History = () => {
   const [user, setUser] = useState<User>();
   const [expenses, setExpenses] = useState<Array<Expense>>([]);
+  const [budget, setBudget] = useState<
+    Database["public"]["Tables"]["budget"]["Row"] | null
+  >(null);
   const [month, setMonth] = useState(dayjs().month());
   const [year, setYear] = useState(dayjs().year());
   const [sort, setSort] = useState<"asc" | "desc">("desc");
@@ -51,6 +56,16 @@ const History = () => {
         )
         .order("date", { ascending: sort === "asc" });
 
+      const budget = await supabase
+        .from("budget")
+        .select("*")
+        .eq("user_id", user?.id!)
+        .eq("month", month)
+        .eq("year", year)
+        .single();
+
+      setBudget(budget.data);
+
       setExpenses(expenses as Array<Expense>);
       setLoading(false);
     };
@@ -69,6 +84,11 @@ const History = () => {
       return acc;
     }, {} as Record<string, Array<Expense>>);
   }, [expenses]);
+
+  const balance = useMemo(
+    () => (budget?.amount ? (budget?.amount || 0) - totalMonthExpense : 0),
+    [budget?.amount, totalMonthExpense]
+  );
 
   return (
     <main className="p-6">
@@ -110,9 +130,121 @@ const History = () => {
       </div>
 
       <AddButton />
-      <h2 className="text-2xl font-bold mt-4">
-        Total: ₹{totalMonthExpense.toFixed(2)}
+      <h2 className="text-xl font-bold mt-4">
+        Total Spendings: ₹{totalMonthExpense.toFixed(2)}
       </h2>
+      <div className="flex gap-5 mt-4 items-center justify-between">
+        <div className="flex flex-col gap-2 ">
+          <h2 className="text-xl font-bold">
+            Budget:{" "}
+            {budget?.amount ? (
+              <> ₹{budget?.amount?.toFixed(2)}</>
+            ) : (
+              <>Not Set</>
+            )}
+          </h2>
+          {budget?.amount ? (
+            <h2
+              className={`text-xl font-bold ${
+                balance < 0 ? "text-red-500" : "text-green-500"
+              }`}
+            >
+              Balance: ₹{balance.toFixed(2)}
+            </h2>
+          ) : null}
+        </div>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            const element = document.getElementById("my_modal_1")! as any;
+
+            if (element.showModal) {
+              element.showModal();
+            }
+          }}
+        >
+          Set Budget
+        </button>
+      </div>
+
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box">
+          <div className="flex items-start justify-between">
+            <h3 className="font-bold text-lg">Set Budget</h3>
+
+            <FiXCircle
+              fontSize={20}
+              onClick={() => {
+                const element = document.getElementById("my_modal_1")! as any;
+
+                if (element.close) {
+                  element.close();
+                }
+              }}
+            />
+          </div>
+          <div className="py-4">
+            <input
+              placeholder="Enter Budget"
+              className="input input-bordered w-full"
+              name="budget"
+              type="number"
+              id="budget"
+            />
+          </div>
+          <div className="modal-action">
+            <button
+              className="btn btn-primary"
+              onClick={async () => {
+                const element = document.getElementById("my_modal_1")! as any;
+
+                if (element.close) {
+                  element.close();
+                }
+
+                const newBudget = (
+                  document.getElementById("budget") as HTMLInputElement
+                )?.value;
+
+                if (!newBudget) {
+                  return toast.error("Please enter a valid budget amount");
+                }
+
+                if (!budget?.id) {
+                  await supabase.from("budget").insert({
+                    amount: Number(newBudget),
+                    month,
+                    year,
+                    user_id: user?.id,
+                  });
+                } else {
+                  await supabase
+                    .from("budget")
+                    .update({
+                      amount: Number(newBudget),
+                    })
+                    .eq("id", budget?.id);
+                }
+
+                setBudget({
+                  amount: Number(newBudget),
+                  month,
+                  year,
+                  user_id: user?.id!,
+                  id: 1,
+                  created_at: new Date().toDateString(),
+                });
+
+                toast.success("Budget set successfully");
+              }}
+            >
+              Set
+            </button>
+          </div>
+        </div>
+      </dialog>
+
       <div className="flex flex-col gap-5 mt-4 overflow-scroll h-[75vh] pb-24">
         {Object.entries(groupedExpensesByDate).map(([date, expenses]) => (
           <div

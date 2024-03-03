@@ -14,22 +14,25 @@ export type Database = {
           amount: number
           created_at: string
           id: number
-          month_year: string
+          month: number
           user_id: string
+          year: number
         }
         Insert: {
           amount: number
           created_at?: string
           id?: number
-          month_year: string
+          month: number
           user_id?: string
+          year: number
         }
         Update: {
           amount?: number
           created_at?: string
           id?: number
-          month_year?: string
+          month?: number
           user_id?: string
+          year?: number
         }
         Relationships: [
           {

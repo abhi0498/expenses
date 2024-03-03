@@ -180,7 +180,6 @@ const ThisWeek = () => {
       if (error) {
         throw error;
       }
-      console.log(data);
 
       setExpenses(
         data.reduce(
@@ -315,10 +314,13 @@ const ThisWeek = () => {
           data={pieExpenses}
           padAngle={({ datum }) => datum.y}
           // innerRadius={100}
-          colorScale={"qualitative"}
+          colorScale={"heatmap"}
           style={{
             labels: {
               fill: "white",
+            },
+            parent: {
+              padding: 20,
             },
           }}
         />
