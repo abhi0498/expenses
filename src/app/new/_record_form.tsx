@@ -33,7 +33,7 @@ const TextInput = ({ label, placeholder, ...props }: TextInputProps) => {
 const RecordForm = ({
   initialData,
 }: {
-  initialData: Database["public"]["Tables"]["expenses"]["Row"];
+  initialData?: Database["public"]["Tables"]["expenses"]["Row"];
 }) => {
   const navigation = useRouter();
   const formMethods = useForm({
