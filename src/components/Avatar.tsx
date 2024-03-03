@@ -76,6 +76,7 @@ const Avatar = ({ url, uid }: { url: string; uid: string }) => {
       {uploading && <Loader />}
       <input
         type="file"
+        accept="image/*"
         className="grow"
         onChange={(event) => {
           toast.promise(uploadAvatar(event) as any, {
