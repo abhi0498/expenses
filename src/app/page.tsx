@@ -1,12 +1,11 @@
 "use client";
 import AddButton from "@/components/AddButton";
-import ThisWeek from "@/components/ThisWeek";
 import Loader from "@/components/Loader";
+import ThisWeek from "@/components/ThisWeek";
 import { Database } from "@/types/supabase";
 import { supabase } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
-import ThisMonth from "@/components/ThisMonth";
 
 export default function Home() {
   const [profile, setProfile] =
